@@ -26,7 +26,6 @@ variable "char_delimiter" {
 
 variable "repo_name" {
   description = "The name of the CodeCommit repository (e.g. new-repo)."
-  default     = ""
 }
 
 variable "repo_default_branch" {
