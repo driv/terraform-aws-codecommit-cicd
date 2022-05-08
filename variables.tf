@@ -10,13 +10,11 @@
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
 variable "aws_region" {
-  description = "The AWS region to deploy into (default: us-west-2)."
-  default     = "us-west-2"
+  description = "The AWS region to deploy into (e.g. us-west-2)."
 }
 
 variable "organization_name" {
   description = "The organization name provisioning the template (e.g. acme)"
-  default     = "acme"
 }
 
 variable "char_delimiter" {
@@ -54,8 +52,7 @@ variable "build_compute_type" {
 }
 
 variable "build_image" {
-  description = "The build image for CodeBuild to use (default: aws/codebuild/nodejs:6.3.1)"
-  default     = "aws/codebuild/nodejs:6.3.1"
+  description = "The build image for CodeBuild to use (e.g. aws/codebuild/nodejs:6.3.1)"
 }
 
 variable "build_privileged_override" {
