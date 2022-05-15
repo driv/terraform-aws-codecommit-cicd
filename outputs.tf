@@ -7,6 +7,10 @@ output "clone_repo_ssh" {
 }
 
 output "artifact_bucket" {
+  value = aws_s3_bucket.build_artifact_bucket.arn
+}
+
+output "artifact_bucket_name" {
   value = aws_s3_bucket.build_artifact_bucket.id
 }
 
