@@ -17,7 +17,6 @@
     {
       "Effect": "Allow",
       "Resource": [
-        "${codebuild_project_test}",
         "${codebuild_project_build}"
       ],
       "Action": [

@@ -64,11 +64,6 @@ variable "build_privileged_override" {
   default     = "false"
 }
 
-variable "test_buildspec" {
-  description = "The buildspec to be used for the Test stage (default: buildspec_test.yml)"
-  default     = "buildspec_test.yml"
-}
-
 variable "package_buildspec" {
   description = "The buildspec to be used for the Package stage (default: buildspec.yml)"
   default     = "buildspec.yml"
