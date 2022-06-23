@@ -89,7 +89,6 @@ data "template_file" "codebuild_policy_template" {
   vars = {
     artifact_bucket         = aws_s3_bucket.build_artifact_bucket.arn
     aws_kms_key             = aws_kms_key.artifact_encryption_key.arn
-    codebuild_project_test  = aws_codebuild_project.test_project.id
     codebuild_project_build = aws_codebuild_project.build_project.id
   }
 }
@@ -123,31 +122,6 @@ resource "aws_codebuild_project" "build_project" {
   source {
     type      = "CODEPIPELINE"
     buildspec = var.package_buildspec
-  }
-}
-
-# CodeBuild Section for the Test stage
-resource "aws_codebuild_project" "test_project" {
-  name           = "${var.repo_name}-test"
-  description    = "The CodeBuild project for ${var.repo_name}"
-  service_role   = aws_iam_role.codebuild_assume_role.arn
-  build_timeout  = var.build_timeout
-  encryption_key = aws_kms_key.artifact_encryption_key.arn
-
-  artifacts {
-    type = "CODEPIPELINE"
-  }
-
-  environment {
-    compute_type    = var.build_compute_type
-    image           = var.build_image
-    type            = "LINUX_CONTAINER"
-    privileged_mode = var.build_privileged_override
-  }
-
-  source {
-    type      = "CODEPIPELINE"
-    buildspec = var.test_buildspec
   }
 }
 
@@ -185,24 +159,6 @@ resource "aws_codepipeline" "codepipeline" {
   }
 
   stage {
-    name = "Test"
-
-    action {
-      name             = "Test"
-      category         = "Test"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      input_artifacts  = ["source"]
-      output_artifacts = ["tested"]
-      version          = "1"
-
-      configuration = {
-        ProjectName = aws_codebuild_project.test_project.name
-      }
-    }
-  }
-
-  stage {
     name = "Package"
 
     action {
@@ -210,12 +166,30 @@ resource "aws_codepipeline" "codepipeline" {
       category         = "Build"
       owner            = "AWS"
       provider         = "CodeBuild"
-      input_artifacts  = ["tested"]
+      input_artifacts  = ["source"]
       output_artifacts = ["packaged"]
       version          = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.build_project.name
+        ProjectName = aws_codebuild_project.build_project.id
+      }
+    }
+  }
+
+  stage {
+    name = "Deploy"
+
+    action {
+      name             = "Deploy"
+      category         = "Deploy"
+      owner            = "AWS"
+      provider         = "CodeDeploy"
+      input_artifacts  = ["packaged"]
+      version          = "1"
+
+      configuration = {
+        ApplicationName = var.repo_name
+        DeploymentGroupName = var.repo_name
       }
     }
   }
